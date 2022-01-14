@@ -1,0 +1,50 @@
+:root {
+    /* hover color and 'view high scores' */
+    --primary-color: rgb(200, 36, 206);
+    /* button colors and background of input for name */
+    --secondary-color: rgb(48, 13, 82);
+}
+* {
+    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+/* HEADER start */
+header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    top: 0;
+    margin: 0 20px;
+}
+header > * {
+    font-size: 1.25rem;
+}
+header a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+/* HEADER end */
+
+.page-content {
+
+}
+
+/* HIGH SCORES start */
+.high-scores-wrapper {
+    background-color: var(--secondary-color);
+    width: 35vw;
+    margin-left: -999px;
+}
+.high-score-title {
+    color: white;
+    font-size: 2rem;
+}
+/* HIGH SCORES end */
+
+/* MAIN CONTENT AREA start */
+.main-content-area {
+    margin-right: 100px;
+    margin-left: 35vw;
+    padding-left: 30px;
+}
+/* MAIN CONTENT AREA start */
