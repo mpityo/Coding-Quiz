@@ -32,7 +32,7 @@ header a {
 /* HIGH SCORES start */
 .high-scores-wrapper {
     background-color: var(--secondary-color);
-    width: 35vw;
+    width: 25vw;
     margin-left: -999px;
 }
 .high-score-title {
@@ -44,7 +44,19 @@ header a {
 /* MAIN CONTENT AREA start */
 .main-content-area {
     margin-right: 100px;
-    margin-left: 35vw;
+    margin-left: 25vw;
     padding-left: 30px;
+}
+.btn {
+    background-color: var(--secondary-color);
+    color: white;
+    font-size: 1.05rem;
+    border-radius: 5px;
+    border: none;
+    padding: 8px 17px;
+}
+.btn:hover {
+    background-color: var(--primary-color);
+    cursor: pointer;
 }
 /* MAIN CONTENT AREA start */
