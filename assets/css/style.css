@@ -23,6 +23,9 @@ header a {
     color: var(--primary-color);
     text-decoration: none;
 }
+header a:hover {
+    color: var(--secondary-color);
+}
 /* HEADER end */
 
 .page-content {
