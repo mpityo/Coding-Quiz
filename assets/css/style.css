@@ -62,4 +62,10 @@ header a:hover {
     background-color: var(--primary-color);
     cursor: pointer;
 }
+
+.main-content-area .btn {
+    margin: 3px;
+    min-width: 200px;
+    max-width: 200px;
+}
 /* MAIN CONTENT AREA start */

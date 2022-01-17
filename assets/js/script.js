@@ -2,15 +2,24 @@ console.log(masterQuestionList);
 
 var timerEl = document.querySelector("#timer");
 var startQuizBtn = document.querySelector("#start-quiz");
-
 var mainQuestionAreaEl = document.querySelector(".main-content-area");
 
 var timeToFinish = 10;
 
-// create html content for:
-//  - question (questionHeaderEl)
-//  - answers buttons (answerListEl, answer1Btn - answer4BtnEl)
-//    - add 'btn' as class for CSS themeing
+
+var buttonHandler = function(event) {
+    var targetEl = event.target;
+
+    if (targetEl.matches("#start-quiz")) {
+        startQuiz();
+    } else if (targetEl.matches("#ans-btn")) {
+        if (targetEl.getAttribute("correct")) {
+            questionAnswered(true);
+        } else {
+            questionAnswered(false);
+        }
+    }
+}
 
 var startQuiz = function () {
     // create timer, updates on main header bar
@@ -24,30 +33,65 @@ var startQuiz = function () {
         }
         timeToFinish--;
     }, 1000);
-
     // remove button and paragraph from screen
     startQuizBtn.remove();
     mainQuestionAreaEl.querySelector("p").remove();
-
+    // load the first question and base answer buttons
     loadQuestion();
 }
 
-var createQuestionBtns = function () {
+var createAnswerBtns = function (answers, correctAnswer) {
+    for (var i = 0; i < 4; i++) {
+        var answerArea = document.createElement("div");
+        answerArea.className = "ans-area";
 
+        var answerBtn = document.createElement("button");
+        answerBtn.className = "ans" + (i+1) + " btn"; //ans1, ans2, ans3, etc...
+        answerBtn.id = "ans-btn";
+        answerBtn.textContent = (i+1) + ". " + answers[i];
+
+        if (correctAnswer === answers[i]) {
+            answerBtn.setAttribute("correct", true);
+        }
+
+        answerArea.appendChild(answerBtn);
+        mainQuestionAreaEl.appendChild(answerArea);
+    }
 }
 
 var loadQuestion = function() {
-    var questionHeaderEl = document.querySelector(".question-spot");
-    questionHeaderEl.textContent = masterQuestionList[0].question;
+    if (masterQuestionList.length > 0) {
+        var questionAnswer = randomQuestionAndAnswers();
+        createAnswerBtns(questionAnswer.answers, questionAnswer.correct);
+        var questionHeaderEl = document.querySelector(".question-spot");
+
+        questionHeaderEl.textContent = questionAnswer.question;
+    } else {
+        clearInterval(timer);
+        endQuiz();
+    }
 }
 
-// load the first (and subsequent) questions by:
-//  - randomize the question array and get a random array slot
-//  - take question and change content from questionHeaderEl
-//  - loop through answers
-//    - randomize answers
-//    - display questions with "1. XXXXXX"
-//  - remove question from array
+var randomQuestionAndAnswers = function () {
+    // get random number and pick that question to show the user
+    var randomNumber = Math.floor(Math.random() * masterQuestionList.length);
+    var questionAnswer = masterQuestionList[randomNumber];
+
+    // remove question that was chosen from main list so it doesn't appear again
+    masterQuestionList.splice(randomNumber, 1);
+
+    // randomize the answers
+    var randomAnswers = [];
+    for (var i = 0; i < 4; i++) {
+        var random = Math.floor(Math.random() * (4-i));
+        randomAnswers[i] = questionAnswer.answers[random];
+        questionAnswer.answers.splice(random, 1);
+    }
+    questionAnswer.answers = randomAnswers;
+
+    // returns the question, random answers, and correct answer
+    return questionAnswer;
+}
 
 // create button listener for answer buttons
 // based on button press:
@@ -60,6 +104,9 @@ var loadQuestion = function() {
 //  - subtract 10 seconds from quiz
 //    - (OPTIONAL) - CSS to show removal of time from timer
 //  - display the next question
+var questionAnswered = function () {
+    
+}
 
 // once masterQuestionList is empty or the timer has reached 0:
 //  - remove quiz content from screen
@@ -95,4 +142,4 @@ var endQuiz = function () {
 //      - alert() user that scores have been cleared
 //      - reload to main screen
 
-startQuizBtn.addEventListener("click", startQuiz);
+mainQuestionAreaEl.addEventListener("click", buttonHandler);
