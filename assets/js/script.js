@@ -2,6 +2,8 @@ console.log(masterQuestionList);
 
 // get button listener to start quiz
 // start timer for 75 seconds
+//  - add timer function
+//  - change content from HTML timer to "Time: XX"
 // remove main content element on screen
 // create html content for:
 //  - question (questionHeaderEl)
