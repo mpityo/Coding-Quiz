@@ -5,7 +5,8 @@ var startQuizBtn = document.querySelector("#start-quiz");
 var mainQuestionAreaEl = document.querySelector(".main-content-area");
 var mainAnswerArea = document.createElement("div");
 
-var timeToFinish = 75;
+var numberOfQuestions = masterQuestionList.length;
+var timeToFinish = numberOfQuestions*8; // 8 seconds per question
 
 
 var buttonHandler = function(event) {
@@ -22,6 +23,12 @@ var buttonHandler = function(event) {
     }
 }
 
+var removeContent = function (content) {
+	for (var i = 0; i < content.length; i++) {
+		document.querySelector(content[i]).remove();
+	}
+}
+
 var startQuiz = function () {
     // create timer, updates on main header bar
     var timer = setInterval(function() {
@@ -31,12 +38,12 @@ var startQuiz = function () {
         }
         if (timeToFinish <= 0) {
             clearInterval(timer);
+			timeToFinish = 0;
         }
         timeToFinish--;
     }, 1000);
     // remove button and paragraph from screen
-    startQuizBtn.remove();
-    mainQuestionAreaEl.querySelector("p").remove();
+    removeContent(['.btn','#quiz-description']);
     mainQuestionAreaEl.appendChild(mainAnswerArea);
     // load the first question and base answer buttons
     loadQuestion();
@@ -105,24 +112,50 @@ var questionAnswered = function (answeredCorrectly) {
         timeToFinish -= 15;
     }
     // remove the answers and load the next question
-    document.querySelector(".ans-area").remove();
+	document.querySelector('.ans-area').remove();
     loadQuestion();
 }
 
-// once masterQuestionList is empty or the timer has reached 0:
-//  - remove quiz content from screen
-//  - replace questionHeaderEl.content with "All Done!"
-//  - add p underneath with "Your final score is XX."
-//  - create another p that shares line with textbox that says "Enter Initials:"
-//  - create textbox, no shading or ghost text
-//  - create btn (submitHighScoreBtn), same line as textbox
-//    - give it class of 'btn' for CSS themeing
-//    - text of "Submit"
-//  - add action listener for submitHighScoreBtn
+// END QUIZ after all questions are answered OR time runs out
 var endQuiz = function () {
+	var score = 0;
+	document.querySelector('.response-form').remove();
+    if (masterQuestionList.length === 0) {
+    	score = (timeToFinish+numberOfQuestions);
+		alert("You've answered all the questions!");
+	} else {
+		alert("You've run out of time!");
+		score = (numberOfQuestions - masterQuestionList.length);
+	}
     timeToFinish = 0;
-    
+	
+	enterHighScore(score);
 }
+
+var enterHighScore = function (score) {
+	mainQuestionAreaEl.querySelector(".question-spot").textContent = "All Done!";
+	var scoreInputArea = document.createElement('div');
+	scoreInputArea.className = "score-input-wrapper";
+	var description = document.createElement('p');
+	description.textContent = "Your final score is " + score;
+	description.setAttribute("score", score);
+	var enterInitials = document.createElement('input');
+	enterInitials.type = "text";
+	enterInitials.id = "score-initials";
+	enterInitials.name = "initials";
+	var enterInitialsLabel = document.createElement('label');
+	enterInitialsLabel.name = "initials";
+	enterInitialsLabel.textContent = "Enter Initials:";
+	var submitHighScoreBtn = document.createElement("button");
+	submitHighScoreBtn.className = "btn";
+	submitHighScoreBtn.textContent = "Submit";
+	scoreInputArea.appendChild(description);
+	scoreInputArea.appendChild(enterInitialsLabel);
+	scoreInputArea.appendChild(enterInitials);
+	scoreInputArea.appendChild(submitHighScoreBtn);
+	mainQuestionAreaEl.appendChild(scoreInputArea);
+}
+
 //  once submit button has been pressed:
 //  - remove content from main screen
 //  - change questionHeaderEl.content to "High Scores"
@@ -143,5 +176,40 @@ var endQuiz = function () {
 //      - clear local storage and delete all list items on screen
 //      - alert() user that scores have been cleared
 //      - reload to main screen
+var saveScore = function (currentScore, localScores) {
+	if (localScores) {
+		var scores = [];
+		for (var i = 0; i < localScores.length; i++) {
+			if (parseInt(localScores[i].getAttribute("scores")) < currentScore[0]) {
+				scores.push(currentScore[0]);
+			} else {
+				scores.push(localScores[i].getAttribute("scores"));
+			}
+		}
+		localStorage.setItem("scores", scores[0]);
+		localStorage.setItem("initial", scores[1]);
+	} else {
+		localStorage.setItem("scores", currentScore[0]);
+		if (currentScore[1])
+			localStorage.setItem("initials", currentScore[1]);
+		else
+			localStorage.setItem("initials", "NA");
+	}
+}
+
+var loadScores = function () {
+	var local = [];
+	local.scores = JSON.parse(localStorage.getItem("scores"));
+	local.initials = JSON.parse(localStorage.getItem("initials"));
+	return local;
+}
+
+var displayHighScores = function () {
+	currentScore = [document.getAttribute("score"), document.querySelector('#score-name')];
+	scores = saveScore(currentScore, loadScores);
+	mainQuestionAreaEl.querySelector(".question-spot").textContent = "High Scores";
+	document.querySelector('.score-input-wrapper').remove();
+}
 
 mainQuestionAreaEl.addEventListener("click", buttonHandler);
+highScoreArea.addEventListener("submit", displayHighScores);
