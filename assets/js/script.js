@@ -3,8 +3,9 @@ console.log(masterQuestionList);
 var timerEl = document.querySelector("#timer");
 var startQuizBtn = document.querySelector("#start-quiz");
 var mainQuestionAreaEl = document.querySelector(".main-content-area");
+var mainAnswerArea = document.createElement("div");
 
-var timeToFinish = 10;
+var timeToFinish = 75;
 
 
 var buttonHandler = function(event) {
@@ -36,15 +37,15 @@ var startQuiz = function () {
     // remove button and paragraph from screen
     startQuizBtn.remove();
     mainQuestionAreaEl.querySelector("p").remove();
+    mainQuestionAreaEl.appendChild(mainAnswerArea);
     // load the first question and base answer buttons
     loadQuestion();
 }
 
 var createAnswerBtns = function (answers, correctAnswer) {
+    var answerArea = document.createElement("div");
+    answerArea.className = "ans-area";
     for (var i = 0; i < 4; i++) {
-        var answerArea = document.createElement("div");
-        answerArea.className = "ans-area";
-
         var answerBtn = document.createElement("button");
         answerBtn.className = "ans" + (i+1) + " btn"; //ans1, ans2, ans3, etc...
         answerBtn.id = "ans-btn";
@@ -53,9 +54,8 @@ var createAnswerBtns = function (answers, correctAnswer) {
         if (correctAnswer === answers[i]) {
             answerBtn.setAttribute("correct", true);
         }
-
         answerArea.appendChild(answerBtn);
-        mainQuestionAreaEl.appendChild(answerArea);
+        mainAnswerArea.appendChild(answerArea);
     }
 }
 
@@ -64,7 +64,6 @@ var loadQuestion = function() {
         var questionAnswer = randomQuestionAndAnswers();
         createAnswerBtns(questionAnswer.answers, questionAnswer.correct);
         var questionHeaderEl = document.querySelector(".question-spot");
-
         questionHeaderEl.textContent = questionAnswer.question;
     } else {
         clearInterval(timer);
@@ -76,10 +75,8 @@ var randomQuestionAndAnswers = function () {
     // get random number and pick that question to show the user
     var randomNumber = Math.floor(Math.random() * masterQuestionList.length);
     var questionAnswer = masterQuestionList[randomNumber];
-
     // remove question that was chosen from main list so it doesn't appear again
     masterQuestionList.splice(randomNumber, 1);
-
     // randomize the answers
     var randomAnswers = [];
     for (var i = 0; i < 4; i++) {
@@ -93,19 +90,23 @@ var randomQuestionAndAnswers = function () {
     return questionAnswer;
 }
 
-// create button listener for answer buttons
-// based on button press:
-//  - TODO
-// if question is right:
-//  - display "correct" under question
-//  - display the next question
-// if answer is wrong:
-//  - display "wrong" under question
-//  - subtract 10 seconds from quiz
-//    - (OPTIONAL) - CSS to show removal of time from timer
-//  - display the next question
-var questionAnswered = function () {
-    
+var questionAnswered = function (answeredCorrectly) {
+    // if there isn't already a place for "correct" or "wrong", make it
+    if (!document.querySelector(".response-form")) {
+        var responseEl = document.createElement("div");
+        responseEl.className = "response-form";
+        mainQuestionAreaEl.appendChild(responseEl);
+    }
+    // create text for if they got the question right or wrong
+    if (answeredCorrectly) {
+        document.querySelector(".response-form").textContent = "Correct!";
+    } else {
+        document.querySelector(".response-form").textContent = "Wrong!";
+        timeToFinish -= 15;
+    }
+    // remove the answers and load the next question
+    document.querySelector(".ans-area").remove();
+    loadQuestion();
 }
 
 // once masterQuestionList is empty or the timer has reached 0:
@@ -119,7 +120,8 @@ var questionAnswered = function () {
 //    - text of "Submit"
 //  - add action listener for submitHighScoreBtn
 var endQuiz = function () {
-    alert("Time has ended!");
+    timeToFinish = 0;
+    
 }
 //  once submit button has been pressed:
 //  - remove content from main screen

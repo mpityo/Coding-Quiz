@@ -68,4 +68,16 @@ header a:hover {
     min-width: 200px;
     max-width: 200px;
 }
+#ans-btn {
+    display: block;
+    text-align: left;
+}
+.response-form {
+    color: grey;
+    border-top: 2px solid lightgray;
+    margin-top: 10px;
+    padding-top: 5px;
+    font-size: 25px;
+    font-style: oblique;
+}
 /* MAIN CONTENT AREA start */
