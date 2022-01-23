@@ -269,4 +269,9 @@ var displayHighScores = function () {
     mainQuestionAreaEl.appendChild(clearHighScoresBtn);
 }
 
+var highScorePopUp = function () {
+
+}
+
 mainQuestionAreaEl.addEventListener("click", buttonHandler);
+document.querySelector("high-scores-link").addEventListener("click", highScorePopUp);
