@@ -8,15 +8,19 @@ var questionList = masterQuestionList;
 var numberOfQuestions = questionList.length;
 var timeToFinish = numberOfQuestions*8; // 8 seconds per question
 var questionsCorrect = 0;
+var quizStatus = false;
 
 
 var buttonHandler = function(event) {
     var targetEl = event.target;
 
     if (targetEl.matches("#start-quiz")) {
+        quizStatus = true;
         startQuiz();
     } else 
     if (targetEl.matches("#ans-btn")) {
+        if (questionList.length === 0)
+            quizStatus = false;
         if (targetEl.getAttribute("correct")) {
             questionAnswered(true);
         } else {
@@ -34,29 +38,32 @@ var buttonHandler = function(event) {
         location.reload();    
     } else 
     if (targetEl.matches('#clear-scores-btn')) {
-        localStorage.removeItem("high-scores");
-        localStorage.removeItem("initials");
-        removeContent(".high-scores-area");
-        alert("High scores have been reset");
+        if (localStorage.getItem("high-scores")) {    
+            localStorage.removeItem("high-scores");
+            localStorage.removeItem("initials");
+            removeContent([".high-scores-area"]);
+            alert("High scores have been reset");
+        } else {
+            alert("There are no high scores to remove!");
+        }
     }
 }
 
 var removeContent = function (content) {
     for (var i = 0; i < content.length; i++) {
-        if (document.querySelector(content[i]))
-		    document.querySelector(content[i]).remove();
-	}
+		document.querySelector(content[i]).remove();
+    }
 }
 
 var startQuiz = function () {
     // create timer, updates on main header bar
     var timer = setInterval(function() {
-        timeToFinish--;
         timerEl.textContent = "Time: " + timeToFinish;
-        if (timeToFinish <= 0) {
+        if (timeToFinish === 0 || !quizStatus) {
             clearInterval(timer);
             endQuiz();
         }
+        timeToFinish--;
     }, 1000);
     // remove button and paragraph from screen
     removeContent(['.btn','#quiz-description']);
@@ -68,7 +75,6 @@ var startQuiz = function () {
 // END QUIZ after all questions are answered OR time runs out
 var endQuiz = function () {
 	var score = 0;
-	//document.querySelector('.response-form').remove();
     mainAnswerArea.remove();
     if (questionList.length === 0) {
     	score = (timeToFinish+questionsCorrect);
@@ -104,8 +110,6 @@ var loadQuestion = function() {
         createAnswerBtns(questionAnswer.answers, questionAnswer.correct);
         var questionHeaderEl = document.querySelector(".question-spot");
         questionHeaderEl.textContent = questionAnswer.question;
-    } else {
-        timeToFinish = 0;
     }
 }
 
@@ -141,10 +145,11 @@ var questionAnswered = function (answeredCorrectly) {
         questionsCorrect += 1;
     } else {
         document.querySelector(".response-form").textContent = "Wrong!";
-        if (timeToFinish > 15)
-            timeToFinish -= 15;
-        else
+        if (timeToFinish > 10) {
+            timeToFinish -= 10;
+        } else {
             timeToFinish = 0;
+        }
     }
     if (timeToFinish > 0) {
         // remove the answers and load the next question
@@ -154,11 +159,13 @@ var questionAnswered = function (answeredCorrectly) {
 }
 
 var enterHighScore = function (score) {
+    if (document.querySelector(".response-form"))
+        document.querySelector(".response-form").remove();
 	mainQuestionAreaEl.querySelector(".question-spot").textContent = "All Done!";
 	var scoreInputArea = document.createElement('div');
 	scoreInputArea.className = "score-input-wrapper";
 	var description = document.createElement('p');
-	description.textContent = "Your final score is " + score;
+	description.textContent = "Your final score is " + score + ".";
 	description.setAttribute("score", score);
     description.id = "score-text";
 	var enterInitials = document.createElement('input');
