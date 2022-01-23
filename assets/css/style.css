@@ -81,3 +81,12 @@ header a:hover {
     font-style: oblique;
 }
 /* MAIN CONTENT AREA start */
+
+/* HIGH SCORES start */
+.high-scores {
+    display: block;
+    background-color: rgb(48, 13, 82, 0.5);
+    min-width: 300px;
+    max-width: 300px;
+    margin: 3px;
+}

@@ -51,7 +51,8 @@ var startQuiz = function () {
 // END QUIZ after all questions are answered OR time runs out
 var endQuiz = function () {
 	var score = 0;
-	document.querySelector('.response-form').remove();
+	//document.querySelector('.response-form').remove();
+    mainAnswerArea.remove();
     if (masterQuestionList.length === 0) {
     	score = (timeToFinish+questionsCorrect);
 		alert("You've answered all the questions!");
@@ -160,23 +161,81 @@ var enterHighScore = function (score) {
 	mainQuestionAreaEl.appendChild(scoreInputArea);
 }
 
-var saveScore = function () {
-    
+var insertIntoArray = function (index, arr, contentToAdd) {
+    if (index === 0) {
+        arr.unshift(contentToAdd);
+    } else
+    if (index === arr.length) {
+        arr.push(contentToAdd);
+    } else {
+        arr.splice(index, 0, contentToAdd);
+    }
 }
 
-var loadScores = function () {
-    
+var saveScore = function (localScores, localInitials, scoreToSave) {
+    var scores = [];
+    var initials = [];
+    if (localScores) {
+        for (var l = 0; l < localScores.length; l++) {
+            scores.push(localScores[l]);
+            initials.push(localInitials[l]);
+        }
+        for (var i = 0; i < scores.length; i++) {
+
+            if (scoreToSave[0] > scores[i]) {
+                insertIntoArray(i, scores, scoreToSave[0]);
+                insertIntoArray(i, initials, scoreToSave[1]);
+                i = scores.length;
+            } 
+            else if (scoreToSave[0] === scores[i] && scoreToSave[0] > scores[i+1]) {
+                insertIntoArray((i+1), scores, scoreToSave[0]);
+                insertIntoArray((i+1), initials, scoreToSave[1]);
+                i = scores.length;
+            } 
+            else if ((i+1) > scores.length) {
+                insertIntoArray(scores.length, scores, scoreToSave[0]);
+                insertIntoArray(initials.length, initials, scoreToSave[1]);
+            }
+        }
+        localStorage.setItem("high-scores", JSON.stringify(scores));
+        localStorage.setItem("initials", JSON.stringify(initials));
+    } else {
+        scores[0] = (scoreToSave[0]);
+        initials[0] = (scoreToSave[1]);
+        localStorage.setItem("high-scores", JSON.stringify(scores[0]));
+        localStorage.setItem("initials", JSON.stringify(initials[0]));
+    }
+}
+
+var saveLoadScoreHandler = function () {
+    var scoreToSave = [
+        score = mainQuestionAreaEl.querySelector('#score-text').getAttribute("score"),
+        mainQuestionAreaEl.querySelector('#score-initials').value
+    ];
+    var localScores = JSON.parse(localStorage.getItem("high-scores"));
+    var localInitials = JSON.parse(localStorage.getItem("initials"));
+
+	saveScore(localScores, localInitials, scoreToSave);
 }
 
 var displayHighScores = function () {
-    var score = mainQuestionAreaEl.querySelector('#score-text').getAttribute("score");
-    var initials = mainQuestionAreaEl.querySelector('#score-initials').value;
+    saveLoadScoreHandler();
 
-    var localScores = loadScores;
-	var scoresToList = saveScore(localScores, scoreToSave);
-
-	mainQuestionAreaEl.querySelector(".question-spot").textContent = "High Scores";
+	mainQuestionAreaEl.querySelector(".question-spot").textContent = "High scores";
 	document.querySelector('.score-input-wrapper').remove();
+    if (document.querySelector('.response-form')) {
+        document.querySelector('.response-form').remove();
+    }
+
+    var scoresToDisplay = JSON.parse(localStorage.getItem("high-scores"));
+    var initialsToDisplay = JSON.parse(localStorage.getItem("initials"));
+
+     var highScoresWrapperEl = document.createElement("div");
+     highScoresWarpperEl.className = "high-scores-area";
+     for (var i = 0; scoresToDisplay.length; i++) {
+        var highScore = document.createElement("div");
+        highScore.className = "high-score";
+     }
 }
 
 mainQuestionAreaEl.addEventListener("click", buttonHandler);
