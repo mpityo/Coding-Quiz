@@ -1,6 +1,7 @@
 var timerEl = document.querySelector("#timer");
 var startQuizBtn = document.querySelector("#start-quiz");
 var mainQuestionAreaEl = document.querySelector(".main-content-area");
+var headerEl = document.querySelector("header");
 var mainAnswerArea = document.createElement("div");
 
 var questionList = masterQuestionList;
@@ -274,4 +275,4 @@ var highScorePopUp = function () {
 }
 
 mainQuestionAreaEl.addEventListener("click", buttonHandler);
-document.querySelector("high-scores-link").addEventListener("click", highScorePopUp);
+headerEl.querySelector(".high-scores-link").addEventListener("click", highScorePopUp);
