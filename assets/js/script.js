@@ -3,7 +3,8 @@ var startQuizBtn = document.querySelector("#start-quiz");
 var mainQuestionAreaEl = document.querySelector(".main-content-area");
 var mainAnswerArea = document.createElement("div");
 
-var numberOfQuestions = masterQuestionList.length;
+var questionList = masterQuestionList;
+var numberOfQuestions = questionList.length;
 var timeToFinish = numberOfQuestions*8; // 8 seconds per question
 var questionsCorrect = 0;
 
@@ -13,21 +14,36 @@ var buttonHandler = function(event) {
 
     if (targetEl.matches("#start-quiz")) {
         startQuiz();
-    } else if (targetEl.matches("#ans-btn")) {
+    } else 
+    if (targetEl.matches("#ans-btn")) {
         if (targetEl.getAttribute("correct")) {
             questionAnswered(true);
         } else {
             questionAnswered(false);
         }
-    } else if (targetEl.matches('.score-btn')) {
-        console.log("Score button was clicked");
-        displayHighScores();
+    } else 
+    if (targetEl.matches('.score-btn')) {
+        if (mainQuestionAreaEl.querySelector('#score-initials').value) {
+            displayHighScores();
+        } else {
+            alert("You must enter a value for your initials!");
+        }
+    } else 
+    if (targetEl.matches('#go-back-btn')) {
+        location.reload();    
+    } else 
+    if (targetEl.matches('#clear-scores-btn')) {
+        localStorage.removeItem("high-scores");
+        localStorage.removeItem("initials");
+        removeContent(".high-scores-area");
+        alert("High scores have been reset");
     }
 }
 
 var removeContent = function (content) {
-	for (var i = 0; i < content.length; i++) {
-		document.querySelector(content[i]).remove();
+    for (var i = 0; i < content.length; i++) {
+        if (document.querySelector(content[i]))
+		    document.querySelector(content[i]).remove();
 	}
 }
 
@@ -53,7 +69,7 @@ var endQuiz = function () {
 	var score = 0;
 	//document.querySelector('.response-form').remove();
     mainAnswerArea.remove();
-    if (masterQuestionList.length === 0) {
+    if (questionList.length === 0) {
     	score = (timeToFinish+questionsCorrect);
 		alert("You've answered all the questions!");
 	} else {
@@ -82,7 +98,7 @@ var createAnswerBtns = function (answers, correctAnswer) {
 }
 
 var loadQuestion = function() {
-    if (masterQuestionList.length > 0) {
+    if (questionList.length > 0) {
         var questionAnswer = randomQuestionAndAnswers();
         createAnswerBtns(questionAnswer.answers, questionAnswer.correct);
         var questionHeaderEl = document.querySelector(".question-spot");
@@ -94,10 +110,10 @@ var loadQuestion = function() {
 
 var randomQuestionAndAnswers = function () {
     // get random number and pick that question to show the user
-    var randomNumber = Math.floor(Math.random() * masterQuestionList.length);
-    var questionAnswer = masterQuestionList[randomNumber];
+    var randomNumber = Math.floor(Math.random() * questionList.length);
+    var questionAnswer = questionList[randomNumber];
     // remove question that was chosen from main list so it doesn't appear again
-    masterQuestionList.splice(randomNumber, 1);
+    questionList.splice(randomNumber, 1);
     // randomize the answers
     var randomAnswers = [];
     for (var i = 0; i < 4; i++) {
@@ -180,7 +196,7 @@ var saveScore = function (localScores, localInitials, scoreToSave) {
             scores.push(localScores[l]);
             initials.push(localInitials[l]);
         }
-        for (var i = 0; i < scores.length; i++) {
+        for (var i = 0; i < localScores.length; i++) {
 
             if (scoreToSave[0] > scores[i]) {
                 insertIntoArray(i, scores, scoreToSave[0]);
@@ -192,7 +208,7 @@ var saveScore = function (localScores, localInitials, scoreToSave) {
                 insertIntoArray((i+1), initials, scoreToSave[1]);
                 i = scores.length;
             } 
-            else if ((i+1) > scores.length) {
+            else if ((i+1) === scores.length) {
                 insertIntoArray(scores.length, scores, scoreToSave[0]);
                 insertIntoArray(initials.length, initials, scoreToSave[1]);
             }
@@ -231,11 +247,26 @@ var displayHighScores = function () {
     var initialsToDisplay = JSON.parse(localStorage.getItem("initials"));
 
      var highScoresWrapperEl = document.createElement("div");
-     highScoresWarpperEl.className = "high-scores-area";
-     for (var i = 0; scoresToDisplay.length; i++) {
+     highScoresWrapperEl.className = "high-scores-area";
+     for (var i = 0; i < scoresToDisplay.length; i++) {
+        var initials = initialsToDisplay[i];
         var highScore = document.createElement("div");
         highScore.className = "high-score";
+        highScore.id = "high-score-" + i;
+        highScore.textContent = i+1 + ".  " + initials.toUpperCase() + " - " + scoresToDisplay[i];
+        highScoresWrapperEl.appendChild(highScore);
      }
+    mainQuestionAreaEl.appendChild(highScoresWrapperEl);
+    var goBackBtn = document.createElement("button");
+    goBackBtn.className = "btn hs-btn";
+    goBackBtn.id = "go-back-btn";
+    goBackBtn.textContent = "Go back";
+    var clearHighScoresBtn = document.createElement("button");
+    clearHighScoresBtn.className = "btn hs-btn";
+    clearHighScoresBtn.id = "clear-scores-btn";
+    clearHighScoresBtn.textContent = "Clear high scores";
+    mainQuestionAreaEl.appendChild(goBackBtn);
+    mainQuestionAreaEl.appendChild(clearHighScoresBtn);
 }
 
 mainQuestionAreaEl.addEventListener("click", buttonHandler);
