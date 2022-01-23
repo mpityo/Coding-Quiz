@@ -226,8 +226,8 @@ var saveScore = function (localScores, localInitials, scoreToSave) {
     } else {
         scores[0] = (scoreToSave[0]);
         initials[0] = (scoreToSave[1]);
-        localStorage.setItem("high-scores", JSON.stringify(scores[0]));
-        localStorage.setItem("initials", JSON.stringify(initials[0]));
+        localStorage.setItem("high-scores", JSON.stringify(scores));
+        localStorage.setItem("initials", JSON.stringify(initials));
     }
 }
 

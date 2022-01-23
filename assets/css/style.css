@@ -25,9 +25,12 @@ header a {
 }
 header a:hover {
     color: var(--secondary-color);
+    cursor: pointer;
 }
 /* HEADER end */
-
+.page-content {
+    font-size: 1.25rem;
+}
 /* HIGH SCORES start */
 .high-scores-wrapper {
     background-color: var(--secondary-color);
