@@ -160,46 +160,18 @@ var enterHighScore = function (score) {
 	mainQuestionAreaEl.appendChild(scoreInputArea);
 }
 
-var saveScore = function (localScores, scoreToSave) {
-    var score = scoreToSave[0];
-    var scores = localScores;
-    if (scores) {
-        for (var i = 0; i < localScores.length; i++) {
-            var localScore = scores[i][0];
-
-            if (score > localScore) {
-                scores.splice(i, 0, scoreToSave);
-                i = scores.length;
-            } 
-            else if (score === localScore) {
-                scores.splice((i+1), 0, scoreToSave);
-            } 
-            else if (i === scores.length) {
-                scores.push(scoreToSave);
-            }
-        }
-        localStorage.setItem("high-scores", JSON.stringify(scores));
-    } else {
-        scores = scoreToSave;
-        localStorage.setItem("high-scores", JSON.stringify(scores));
-    }
-    return scores;
+var saveScore = function () {
+    
 }
 
 var loadScores = function () {
-	var string = JSON.parse(localStorage.getItem("high-scores"));
-    for (var i = 0; i < string.length; i++) {
-        
-    }
-	return localScores;
+    
 }
 
 var displayHighScores = function () {
-	debugger;
-    var scoreToSave = [
-        mainQuestionAreaEl.querySelector('#score-text').getAttribute("score"),
-        mainQuestionAreaEl.querySelector('#score-initials').value
-    ];
+    var score = mainQuestionAreaEl.querySelector('#score-text').getAttribute("score");
+    var initials = mainQuestionAreaEl.querySelector('#score-initials').value;
+
     var localScores = loadScores;
 	var scoresToList = saveScore(localScores, scoreToSave);
 
